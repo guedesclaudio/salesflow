@@ -1,0 +1,91 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ActivityStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum SaleStatus {
+  PENDING
+  PROCESSED
+  ERROR
+  CANCELED
+}
+
+model ClientTokens {
+  // Columns
+  id           Int       @id @default(autoincrement()) @map("id")
+  clientId     Int       @map("client_id")
+  accessToken  String    @map("access_token")
+  activityStatus       ActivityStatus    @map("activity_status")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  // Relations  
+  client       Clients   @relation(fields: [clientId], references: [id])
+
+  // Indexes
+  @@index([accessToken], name: "idx_client_tokens_access_token")
+  @@index([deletedAt], name: "idx_client_tokens_deleted_at")
+
+  @@map("client_tokens")
+}
+
+model Clients {
+  // Columns
+  id           Int       @id @default(autoincrement()) @map("id")
+  code         String    @unique @map("code") @db.VarChar(20)
+  name         String    @map("name") @db.VarChar(255)
+  activityStatus       ActivityStatus    @map("activity_status")
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt    DateTime? @map("deleted_at")
+
+  // Relations
+  sales        Sales[]
+  clientTokens ClientTokens[]
+
+  // Indexes
+  @@index([deletedAt], name: "idx_clients_deleted_at")
+  @@index([code], name: "idx_clients_code")
+  @@index([name], name: "idx_clients_name")
+
+  @@map("clients")
+}
+
+model Sales {
+  // Columns
+  id                Int       @id @default(autoincrement()) @map("id")
+  authorizationCode String    @map("authorization_code") @db.VarChar(20)
+  clientId          Int       @map("client_id")
+  saleStatus        SaleStatus      @map("sale_status")
+  value             Decimal   @map("value") @db.Decimal(10,2)
+  userCode          String    @map("user_code") @db.VarChar(11)
+  saleDate          DateTime  @map("sale_date")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  updatedAt         DateTime  @default(now()) @updatedAt @map("updated_at")
+  deletedAt         DateTime? @map("deleted_at")
+
+  // Relations
+  client            Clients   @relation(fields: [clientId], references: [id])
+
+  // Indexes
+  @@index([deletedAt], name: "idx_sales_deleted_at")
+  @@index([userCode], name: "idx_sales_user_code")
+  @@index([saleStatus], name: "idx_sales_sale_status")
+  @@index([saleDate], name: "idx_sales_sale_date")
+  @@index([clientId], name: "idx_sales_client_id")
+
+  // Constraints
+  @@unique([saleDate, authorizationCode], name: "unique_sales_sale_date_authorization_code")
+
+  @@map("sales")
+}
