@@ -4,12 +4,12 @@ import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { Logger } from 'nestjs-pino';
 import { ApplicationModule } from './modules/app.module';
-//import { CommonModule, LogInterceptor } from './modules/common';
+//import { LoggingInterceptor } from './modules/common/flow/logger.interceptor';
 
 const API_DEFAULT_PORT = 3000; //TODO - LEVAR ISSO PRA CONFIG
 const API_DEFAULT_PREFIX = '/api/v1/';
-const SWAGGER_TITLE = 'Passenger API';
-const SWAGGER_DESCRIPTION = 'API used for passenger management';
+const SWAGGER_TITLE = 'Sales Flow API';
+const SWAGGER_DESCRIPTION = 'API payment gateway';
 const SWAGGER_PREFIX = '/docs';
 
 function createSwagger(app: INestApplication) { //TODO - LEVAR PRA OUTRO LUGAR
@@ -28,9 +28,9 @@ async function bootstrap(): Promise<void> {
         ApplicationModule,
         new FastifyAdapter()
     );
-    const logger = app.get(Logger); //TODO - TROCAR PRA PINO
+    const logger = app.get(Logger);
     app.useLogger(logger);
-
+    //app.useGlobalInterceptors(new LoggingInterceptor(app.get(Logger)));
     app.setGlobalPrefix(process.env.API_PREFIX || API_DEFAULT_PREFIX);
 
     if (!process.env.SWAGGER_ENABLE || process.env.SWAGGER_ENABLE === '1') {
@@ -41,7 +41,7 @@ async function bootstrap(): Promise<void> {
     const url = new URL(`http://${host}:${port}/`);
     
     await app.listen(port, host, () => {
-        console.log(`Listening at ${url}`);
+        console.log(`Listening at ${url}`); 
     });
 }
 

@@ -2,8 +2,11 @@ import { Controller, Get, UseGuards } from '@nestjs/common';
 import { HealthCheckService, PrismaHealthIndicator } from '@nestjs/terminus';
 import { PrismaService } from '../provider';
 import { HealthGuard } from '../security/health.guard';
+import { appRoutes } from '../../app.routes';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('health')
+@ApiTags(appRoutes.health.main)
+@Controller(appRoutes.health.main)
 export class HealthController {
     public constructor(
         private readonly health: HealthCheckService,

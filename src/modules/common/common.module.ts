@@ -4,6 +4,7 @@ import { Logger } from 'nestjs-pino';
 import { HealthController } from './controller';
 // import { LogInterceptor } from './flow';
 import { PrismaService } from './provider';
+import { DummyResolver } from './resolvers/dummy.resolver';
 
 @Module({
     imports: [
@@ -12,7 +13,8 @@ import { PrismaService } from './provider';
     providers: [
         Logger,
         //LogInterceptor,
-        PrismaService
+        PrismaService,
+        DummyResolver,
     ],
     exports: [
         Logger,
