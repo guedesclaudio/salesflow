@@ -2,9 +2,11 @@ import { Module } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import { Logger } from 'nestjs-pino';
 import { HealthController } from './controller';
-// import { LogInterceptor } from './flow';
 import { PrismaService } from './provider';
 import { DummyResolver } from './resolvers/dummy.resolver';
+import { ClientTokensRepository } from '../clients/repositories';
+import { ClientValidator } from '../clients/validators';
+import { RestrictedGuard } from './security';
 
 @Module({
     imports: [
@@ -12,14 +14,14 @@ import { DummyResolver } from './resolvers/dummy.resolver';
     ],
     providers: [
         Logger,
-        //LogInterceptor,
         PrismaService,
+        ClientTokensRepository,
+        ClientValidator,
         DummyResolver,
+        RestrictedGuard,
     ],
     exports: [
         Logger,
-        //LogInterceptor,
-        PrismaService
     ],
     controllers: [
         HealthController

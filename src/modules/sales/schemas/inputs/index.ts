@@ -1,0 +1,1 @@
+export { CreateSaleInputSchema } from "./create-sale.input.schema";

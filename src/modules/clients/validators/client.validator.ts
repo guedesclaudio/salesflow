@@ -13,4 +13,11 @@ export class ClientValidator {
         if (!existingClient) return throwError(ErrorsTypeEnum.ClientNotFound);
         return existingClient;
     }
+
+    public async checkId(clientId: string): Promise<ClientTokens | boolean> {
+        const existingClient = await this.clientTokensRepository.findByClientId(clientId);
+        
+        if (!existingClient) return false;
+        return existingClient;
+    }
 }

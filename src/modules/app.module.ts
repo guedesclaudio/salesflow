@@ -6,6 +6,9 @@ import { AuthModule } from './auth/auth.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriverConfig } from '@nestjs/apollo';
 import { graphqlConfig } from '../config/graphql.config';
+import { SalesModule } from './sales/sales.module';
+import { BullBoardModule } from '@bull-board/nestjs';
+import { FastifyAdapter } from "@bull-board/fastify";
 
 @Module({
     imports: [
@@ -16,7 +19,13 @@ import { graphqlConfig } from '../config/graphql.config';
         LoggerModule.forRoot(logConfig()),
         CommonModule,
         AuthModule,
+        
         GraphQLModule.forRoot<ApolloDriverConfig>(graphqlConfig),
+        BullBoardModule.forRoot({
+              route: '/queues',
+              adapter: FastifyAdapter,
+            }),
+            SalesModule,
     ],
 })
 export class ApplicationModule {}

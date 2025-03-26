@@ -9,13 +9,13 @@ export class AuthService {
   constructor(private readonly clientValidator: ClientValidator) {}
   
   public async generateToken(generateTokenDto: GenerateTokenInputSchema): Promise<{ token: string }> {
-    const { id: clientId } = await this.clientValidator.checkAccessToken(generateTokenDto.accessToken) as ClientTokens;
+    const { clientId } = await this.clientValidator.checkAccessToken(generateTokenDto.accessToken) as ClientTokens;
     const payload = { role: generateTokenDto.role, clientId };
     const secretKey = process.env.JWT_SECRET || 'ThisMustBeChanged';
     const issuer = process.env.JWT_ISSUER || 'IssuerApplication';
 
     const token = jwt.sign(payload, secretKey, {
-      expiresIn: '1h', // token expires in 1 hour
+      expiresIn: '1h',
       issuer: issuer,
       algorithm: 'HS256',
     });

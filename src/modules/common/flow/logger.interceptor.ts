@@ -1,35 +1,43 @@
-import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
+import {
+  CallHandler,
+  ExecutionContext,
+  Injectable,
+  NestInterceptor,
+} from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
-import { throwError } from 'rxjs';
+import { throwError, Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import * as useragent from 'useragent';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
   constructor(private readonly logger: Logger) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): any {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     try {
-      const request = context.switchToHttp().getRequest();
+      let request: any;
+      const contextType: any = context.getType();
+
+      if (contextType === 'http') {
+        request = context.switchToHttp().getRequest();
+      } else if (contextType === 'graphql') {
+        const gqlCtx = GqlExecutionContext.create(context);
+        request = gqlCtx.getContext().req;
+      }
+
+
+      if (!request) {
+        return next.handle();
+      }
+
       const { body, query, params, url, method, headers } = request;
       const origin = headers?.origin;
       const securityInfos = this.createSecurityInfos(request, headers);
-
-      const data = this.createDataLog({
-        body,
-        params,
-        query,
-      });
-
-      this.logRequest({
-        method,
-        url,
-        origin,
-        data,
-        securityInfos,
-      });
-
+      const data = this.createDataLog({ body, params, query });
+      this.logRequest({ method, url, origin, data, securityInfos });
       const now = Date.now();
+
       return next.handle().pipe(
         tap((responseData) => {
           try {
@@ -69,6 +77,7 @@ export class LoggingInterceptor implements NestInterceptor {
       );
     } catch (error) {
       this.logTotalError();
+      return next.handle();
     }
   }
 
@@ -101,12 +110,13 @@ export class LoggingInterceptor implements NestInterceptor {
         params: paramsLog,
       });
     } catch (error) {
-      this.logger.error(`Anonymization Error - Error: ${error?.message}}`);
+      this.logger.error(`Anonymization Error - Error: ${error?.message}`);
+      return {};
     }
   }
 
   public logRequest({ method, url, origin, data, securityInfos }: any): void {
-    return this.logger.log(
+    this.logger.log(
       `Request: [${method}] ${url} - Origin ${origin} - Data: ${JSON.stringify(
         data,
       )} - SecurityInfos: ${JSON.stringify(securityInfos)}`,
@@ -114,7 +124,7 @@ export class LoggingInterceptor implements NestInterceptor {
   }
 
   public logTotalError(): void {
-    return this.logger.error('Error: Log total error occurred.');
+    this.logger.error('Error: Log total error occurred.');
   }
 
   public logResponse({
@@ -126,7 +136,7 @@ export class LoggingInterceptor implements NestInterceptor {
     securityInfos,
     origin,
   }: any): void {
-    return this.logger.log(
+    this.logger.log(
       `Response: [${method}] ${url} - Time: ${responseTime}ms - Origin ${origin} - InputData: ${JSON.stringify(
         data,
       )} - ResponseData: ${JSON.stringify(responseData)} - SecurityInfos: ${JSON.stringify(
@@ -136,21 +146,15 @@ export class LoggingInterceptor implements NestInterceptor {
   }
 
   public logResponseError({ method, url, responseTime, data, err, securityInfos, origin }: any): void {
-    return this.logger.error(
+    this.logger.error(
       `ResponseError: [${method}] ${url} - Time: ${responseTime}ms - Origin ${origin} - InputData: ${JSON.stringify(
         data,
-      )} - Error: ${JSON.stringify(err?.message)} - SecurityInfos: ${JSON.stringify(
-        securityInfos,
-      )}`,
+      )} - Error: ${JSON.stringify(err?.message)} - SecurityInfos: ${JSON.stringify(securityInfos)}`,
     );
   }
 
   public returnsValidFields({ body, query, params }: any) {
-    const data: {
-      body?: any;
-      params?: any;
-      query?: any;
-    } = {};
+    const data: { body?: any; params?: any; query?: any } = {};
 
     if (body && !this.isEmptyObject(body)) data.body = body;
     if (params && !this.isEmptyObject(params)) data.params = params;
@@ -159,36 +163,29 @@ export class LoggingInterceptor implements NestInterceptor {
     return data;
   }
 
-    public handleSensitivesFields<T>(data: T): any {
-        const sensitiveFields = (process.env.LOGS_SENSITIVE_FIELDS || '')
-        .split(',')
-        .map((value) => value.trim());
-        if (typeof data !== 'object' || data === null) {
-            return data;
-        }
-
-        for (const key in data) {
-            if (sensitiveFields.includes(key)) {
-            const value = data[key];
-
-            if (typeof value === 'string') data[key] = this.createMask(value.length) as any;
-            }
-
-            if (typeof data[key] === 'object') this.handleSensitivesFields(data[key]);
-        }
+  public handleSensitivesFields<T>(data: T): any {
+    const sensitiveFields = (process.env.LOGS_SENSITIVE_FIELDS || '')
+      .split(',')
+      .map((value) => value.trim());
+    if (typeof data !== 'object' || data === null) {
+      return data;
     }
 
-    public createMask(length: number): string {
+    for (const key in data) {
+      if (sensitiveFields.includes(key)) {
+        const value = data[key];
+        if (typeof value === 'string') data[key] = this.createMask(value.length) as any;
+      }
+      if (typeof data[key] === 'object') {
+        this.handleSensitivesFields(data[key]);
+      }
+    }
+  }
+
+  public createMask(length: number): string {
     if (!length) return '';
 
-    const char = '*';
-    let mask = '';
-
-    for (let i = 0; i < length; i++) {
-      mask += char;
-    }
-
-    return mask;
+    return '*'.repeat(length);
   }
 
   public isEmptyObject(obj: any): boolean {

@@ -7,7 +7,7 @@ CREATE TYPE "SaleStatus" AS ENUM ('PENDING', 'PROCESSED', 'ERROR', 'CANCELED');
 -- CreateTable
 CREATE TABLE "client_tokens" (
     "id" SERIAL NOT NULL,
-    "client_id" INTEGER NOT NULL,
+    "client_id" UUID NOT NULL,
     "access_token" TEXT NOT NULL,
     "activity_status" "ActivityStatus" NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -19,7 +19,7 @@ CREATE TABLE "client_tokens" (
 
 -- CreateTable
 CREATE TABLE "clients" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL,
     "code" VARCHAR(20) NOT NULL,
     "name" VARCHAR(255) NOT NULL,
     "activity_status" "ActivityStatus" NOT NULL,
@@ -32,19 +32,25 @@ CREATE TABLE "clients" (
 
 -- CreateTable
 CREATE TABLE "sales" (
-    "id" SERIAL NOT NULL,
+    "id" UUID NOT NULL,
     "authorization_code" VARCHAR(20) NOT NULL,
-    "client_id" INTEGER NOT NULL,
+    "client_id" UUID NOT NULL,
     "sale_status" "SaleStatus" NOT NULL,
     "value" DECIMAL(10,2) NOT NULL,
     "user_code" VARCHAR(11) NOT NULL,
     "sale_date" TIMESTAMP(3) NOT NULL,
+    "webhook" TEXT,
+    "origin" TEXT NOT NULL,
+    "log" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "deleted_at" TIMESTAMP(3),
 
     CONSTRAINT "sales_pkey" PRIMARY KEY ("id")
 );
+
+-- CreateIndex
+CREATE UNIQUE INDEX "client_tokens_access_token_key" ON "client_tokens"("access_token");
 
 -- CreateIndex
 CREATE INDEX "idx_client_tokens_access_token" ON "client_tokens"("access_token");

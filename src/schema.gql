@@ -2,6 +2,84 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+input CreateSaleInputSchema {
+  """Authorization code for the sale"""
+  authorizationCode: String!
+
+  """Origin sale"""
+  origin: String
+
+  """Sale date in ISO format"""
+  saleDate: String!
+
+  """User code associated with the sale"""
+  userCode: String!
+
+  """Sale value"""
+  value: Float!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input GenerateTokenInputSchema {
+  """Access token used to validate the request."""
+  accessToken: String!
+
+  """Role for generating the token. Must be one of the allowed roles."""
+  role: Role!
+}
+
+type GenerateTokenOutputSchema {
+  """JWT token generated based on the provided credentials"""
+  token: String!
+}
+
+type Mutation {
+  cancelSale(id: Int!): SaleOutputSchema!
+  createSale(input: CreateSaleInputSchema!): SaleOutputSchema!
+  generateJWTToken(input: GenerateTokenInputSchema!): GenerateTokenOutputSchema!
+}
+
 type Query {
   dummyQuery: String!
+}
+
+"""The role of the user, which determines permissions"""
+enum Role {
+  RESTRICTED
+}
+
+type SaleOutputSchema {
+  """Authorization code for the sale"""
+  authorizationCode: String!
+
+  """ID of the client"""
+  clientId: Int!
+
+  """Creation date in ISO format"""
+  createdAt: DateTime!
+
+  """Deletion date in ISO format"""
+  deletedAt: DateTime
+
+  """Unique sale identifier"""
+  id: Int!
+
+  """Sale date in ISO format"""
+  saleDate: DateTime!
+
+  """Sale status"""
+  saleStatus: String!
+
+  """Last update date in ISO format"""
+  updatedAt: DateTime!
+
+  """User code associated with the sale"""
+  userCode: String!
+
+  """Sale value"""
+  value: Float!
 }

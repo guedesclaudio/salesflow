@@ -5,5 +5,10 @@ export const appRoutes = {
     auth: {
         main: "/auth",
         generateJWTToken: "/generateJWTToken",
+    },
+    sales: {
+        main: "/sales",
+        createSale: "createSale",
+        cancelSale: "cancelSale",
     }
 }
