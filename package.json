@@ -1,8 +1,8 @@
 {
-  "name": "nest-template",
+  "name": "sales-flow",
   "version": "0.1.0",
-  "description": "NestJS API project template crafted for Docker environments",
-  "author": "Saluki",
+  "description": "Sales Flow Api",
+  "author": "Claudio",
   "license": "MIT",
   "private": true,
   "engines": {
