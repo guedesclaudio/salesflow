@@ -1,25 +1,37 @@
-import { Resolver, Mutation, Args, Int } from '@nestjs/graphql';
-import { CreateSaleInputSchema } from '../schemas/inputs';
+import { Resolver, Mutation, Args, Int, Context } from '@nestjs/graphql';
+import { CreateSaleInputSchema, PaySaleInputSchema } from '../schemas/inputs';
 import { SaleOutputSchema } from '../schemas/outputs';
 import { RestrictedGuard } from '../../common';
 import { UseGuards } from '@nestjs/common';
-import { CancelSalesService, CreateSalesService } from '../services';
+import { CancelSalesService, CreateSalesService, PaySalesService } from '../services';
 import { OriginSalesEnum } from '../../../contracts/enums/sales.enum';
 
 @Resolver()
 @UseGuards(RestrictedGuard)
 export class SalesResolver {
   constructor(
-      private readonly createSalesService: CreateSalesService,
-      private readonly cancelSalesService: CancelSalesService,
-    ) {}
+    private readonly createSalesService: CreateSalesService,
+    private readonly cancelSalesService: CancelSalesService,
+    private readonly paySalesService: PaySalesService,
+  ) {}
 
-  @Mutation(() => SaleOutputSchema, { name: 'createSale' })
+  @Mutation(() => Boolean, { name: 'createSale' })
   async createSale(
     @Args('input') createSalesDto: CreateSaleInputSchema,
-  ): Promise<SaleOutputSchema> {
-    createSalesDto.origin = OriginSalesEnum.GRAPHQL
-    return this.createSalesService.create(createSalesDto);
+    @Context() context: any,
+  ): Promise<Boolean> {
+    createSalesDto.origin = OriginSalesEnum.GRAPHQL;
+    createSalesDto.clientId = context.req.clientId;
+    return this.createSalesService.enqueue(createSalesDto);
+  }
+
+  @Mutation(() => Boolean, { name: 'paySale' })
+  async paySale(
+    @Args('input') paySalesDto: PaySaleInputSchema,
+    @Context() context: any,
+  ): Promise<Boolean> {
+    paySalesDto.clientId = context.req.clientId;
+    return this.paySalesService.enqueue(paySalesDto);
   }
 
   @Mutation(() => SaleOutputSchema, { name: 'cancelSale' })

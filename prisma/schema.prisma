@@ -17,6 +17,7 @@ enum SaleStatus {
   PROCESSED
   ERROR
   CANCELED
+  WAITING_PAYMENT
 }
 
 model ClientTokens {
@@ -67,11 +68,11 @@ model Sales {
   authorizationCode String               @map("authorization_code") @db.VarChar(20)
   clientId          String               @map("client_id") @db.Uuid
   saleStatus        SaleStatus           @map("sale_status")
-  value             Decimal              @map("value") @db.Decimal(10,2)
+  value             Int                  @map("value")
   userCode          String               @map("user_code") @db.VarChar(11)
   saleDate          DateTime             @map("sale_date")
-  cancelSaleDate    DateTime             @map("cancel_sale_date")
-  webhook           String?              @map("webhook")
+  cancelSaleDate    DateTime?            @map("cancel_sale_date")
+  webhook           String               @map("webhook")
   origin            String               @map("origin")
   log               String?              @map("log")
   createdAt         DateTime             @default(now()) @map("created_at")
@@ -89,7 +90,7 @@ model Sales {
   @@index([clientId], name: "idx_sales_client_id")
 
   // Constraints
-  @@unique([saleDate, authorizationCode], name: "unique_sales_sale_date_authorization_code")
+  @@unique([saleDate, authorizationCode, saleStatus], name: "unique_sales_sale_date_authorization_code_sale_status")
 
   @@map("sales")
 }

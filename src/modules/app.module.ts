@@ -19,13 +19,12 @@ import { FastifyAdapter } from "@bull-board/fastify";
         LoggerModule.forRoot(logConfig()),
         CommonModule,
         AuthModule,
-        
         GraphQLModule.forRoot<ApolloDriverConfig>(graphqlConfig),
         BullBoardModule.forRoot({
-              route: '/queues',
-              adapter: FastifyAdapter,
-            }),
-            SalesModule,
+            route: '/queues',
+            adapter: FastifyAdapter,
+        }),
+        SalesModule,
     ],
 })
 export class ApplicationModule {}

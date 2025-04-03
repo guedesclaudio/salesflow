@@ -6,17 +6,20 @@ input CreateSaleInputSchema {
   """Authorization code for the sale"""
   authorizationCode: String!
 
-  """Origin sale"""
-  origin: String
+  """Cancel sale date in ISO format"""
+  cancelSaleDate: String
 
   """Sale date in ISO format"""
-  saleDate: String!
+  saleDate: DateTime!
 
   """User code associated with the sale"""
   userCode: String!
 
   """Sale value"""
   value: Float!
+
+  """Webhook notification URL"""
+  webhook: String!
 }
 
 """
@@ -39,8 +42,14 @@ type GenerateTokenOutputSchema {
 
 type Mutation {
   cancelSale(id: Int!): SaleOutputSchema!
-  createSale(input: CreateSaleInputSchema!): SaleOutputSchema!
+  createSale(input: CreateSaleInputSchema!): Boolean!
   generateJWTToken(input: GenerateTokenInputSchema!): GenerateTokenOutputSchema!
+  paySale(input: PaySaleInputSchema!): Boolean!
+}
+
+input PaySaleInputSchema {
+  """Sale Identification"""
+  saleId: String!
 }
 
 type Query {

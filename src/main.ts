@@ -17,7 +17,7 @@ async function bootstrap(): Promise<void> {
     app.useGlobalInterceptors(new LoggingInterceptor(logger));
     app.setGlobalPrefix(apiConfig.prefix);
     createSwagger(app);
-    
+
 
     const port = apiConfig.port;
     const host = apiConfig.host;

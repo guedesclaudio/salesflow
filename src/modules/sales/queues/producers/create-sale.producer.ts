@@ -20,7 +20,7 @@ export class SalesProducer {
       attempts: queuesConfig.createSaleQueue.attempts,
       backoff: { type: 'exponential', delay: queuesConfig.createSaleQueue.backoffDelay },
       removeOnComplete: true,
-      removeOnFail: true
+      removeOnFail: false,
     }
   }
 }

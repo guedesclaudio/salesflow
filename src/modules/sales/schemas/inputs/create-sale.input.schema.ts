@@ -2,6 +2,7 @@ import { InputType, Field, Float } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsNumber, IsDateString, IsOptional } from 'class-validator';
 import { OriginSalesEnum } from '../../../../contracts/enums/sales.enum';
+import { SaleStatus } from '@prisma/client';
 
 @InputType()
 export class CreateSaleInputSchema {
@@ -40,16 +41,33 @@ export class CreateSaleInputSchema {
   })
   @IsDateString()
   @IsNotEmpty()
-  @Field(() => String, { description: 'Sale date in ISO format' })
-  saleDate: string;
+  @Field(() => Date, { description: 'Sale date in ISO format' })
+  saleDate: Date;
 
   @ApiProperty({
-    description: 'Origin sale',
-    example: 'graphql',
-    maxLength: 20,
+    description: 'Cancel sale date in ISO format',
+    example: '2025-03-20T12:00:00Z',
+  })
+  @IsDateString()
+  @IsOptional()
+  @Field(() => String, { description: 'Cancel sale date in ISO format', nullable: true })
+  cancelSaleDate?: string;
+
+  // Private
+  origin: OriginSalesEnum;
+
+  // Private
+  clientId: string;
+
+  @ApiProperty({
+    description: 'Webhook notification URL',
+    example: 'https://webhook.com/sale',
   })
   @IsString()
-  @IsOptional()
-  @Field(() => String, { description: 'Origin sale', nullable: true })
-  origin?: OriginSalesEnum;
+  @IsNotEmpty()
+  @Field(() => String, { description: 'Webhook notification URL' })
+  webhook: string;
+
+  // Private
+  saleStatus: SaleStatus;
 }

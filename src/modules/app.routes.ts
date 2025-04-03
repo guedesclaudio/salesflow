@@ -10,5 +10,6 @@ export const appRoutes = {
         main: "/sales",
         createSale: "createSale",
         cancelSale: "cancelSale",
+        paySale: "paySale",
     }
 }

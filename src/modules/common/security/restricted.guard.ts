@@ -30,6 +30,8 @@ export class RestrictedGuard implements CanActivate {
         const existingClient = await this.clientValidator.checkId(payload.clientId);
         if (!existingClient) return false;
 
+        (request as any).clientId = payload.clientId;
+
         return true;
     }
 }

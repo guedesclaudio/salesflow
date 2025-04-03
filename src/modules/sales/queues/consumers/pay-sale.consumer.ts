@@ -3,23 +3,23 @@ import { Job } from 'bullmq';
 import { SalesQueuesEnum } from '../../../../contracts/enums';
 import { Logger } from 'nestjs-pino';
 import { queuesConfig } from '../../../../config/queues.config';
-import { CreateSalesService } from '../../services';
+import { PaySalesService } from '../../services';
 
-@Processor(SalesQueuesEnum.CREATE_SALE, { concurrency: queuesConfig.createSaleQueue.consumerConcurrency })
-export class SalesConsumer extends WorkerHost {
+@Processor(SalesQueuesEnum.PAY_SALE, { concurrency: queuesConfig.paySaleQueue.consumerConcurrency })
+export class PaySalesConsumer extends WorkerHost {
 
   constructor(
     private readonly logger: Logger,
-    private readonly createSalesService: CreateSalesService,
+    private readonly paySalesService: PaySalesService,
   ) {
     super();
   }
 
   public async process(job: Job): Promise<void> {
     switch (job.name) {
-      case queuesConfig.createSaleQueue.jobName:
+      case queuesConfig.paySaleQueue.jobName:
         this.logger.log('Processing sale job:', job.data);
-        await this.createSalesService.processSale(job.data, job);
+        await this.paySalesService.processPayment(job.data);
         break;
 
       default:

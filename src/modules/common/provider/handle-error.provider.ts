@@ -8,6 +8,10 @@ import {
   
   export enum ErrorsTypeEnum {
     ClientNotFound,
+    SaleNotFound,
+    ClientIdIsDifferent,
+    SaleAlreadyProcessed,
+    SaleIsNotWaitingPayment,
   }
   
   export enum ErrorsStatusEnum {
@@ -25,6 +29,22 @@ import {
     [ErrorsTypeEnum.ClientNotFound]: {
       defaultMessage: 'Client was not found',
       status: ErrorsStatusEnum.NOT_FOUND,
+    },
+    [ErrorsTypeEnum.SaleNotFound]: {
+      defaultMessage: 'Sale was not found',
+      status: ErrorsStatusEnum.NOT_FOUND,
+    },
+    [ErrorsTypeEnum.ClientIdIsDifferent]: {
+      defaultMessage: 'Client id is different from client id sale',
+      status: ErrorsStatusEnum.BAD_REQUEST,
+    },
+    [ErrorsTypeEnum.SaleAlreadyProcessed]: {
+      defaultMessage: 'Sale already processed',
+      status: ErrorsStatusEnum.BAD_REQUEST,
+    },
+    [ErrorsTypeEnum.SaleIsNotWaitingPayment]: {
+      defaultMessage: 'Sale is not waiting payment',
+      status: ErrorsStatusEnum.BAD_REQUEST,
     },
   };
   
