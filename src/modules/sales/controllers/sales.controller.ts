@@ -34,7 +34,7 @@ export class SalesController {
     return this.createSalesService.enqueue(createSalesDto);
   }
   
-  @EventPattern(pubSubConfig().subscriptions.createSale)
+  @EventPattern(pubSubConfig.subscriptions.createSale)
   public async createSaleFromPubSub(
     @Body() message: Message,
   ): Promise<Boolean> {

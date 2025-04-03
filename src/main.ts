@@ -5,6 +5,7 @@ import { ApplicationModule } from './modules/app.module';
 import { LoggingInterceptor } from './modules/common/flow/logger.interceptor';
 import { apiConfig } from './config/api.config';
 import { createSwagger } from './config/docs.config';
+import { upPubSub } from './config';
 
 async function bootstrap(): Promise<void> { 
     const app = await NestFactory.create<NestFastifyApplication>(
@@ -18,6 +19,8 @@ async function bootstrap(): Promise<void> {
     app.setGlobalPrefix(apiConfig.prefix);
     createSwagger(app);
 
+    upPubSub(app);
+    app.startAllMicroservices();
 
     const port = apiConfig.port;
     const host = apiConfig.host;
