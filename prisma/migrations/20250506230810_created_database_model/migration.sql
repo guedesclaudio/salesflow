@@ -2,7 +2,7 @@
 CREATE TYPE "ActivityStatus" AS ENUM ('ACTIVE', 'INACTIVE');
 
 -- CreateEnum
-CREATE TYPE "SaleStatus" AS ENUM ('PENDING', 'PROCESSED', 'ERROR', 'CANCELED');
+CREATE TYPE "SaleStatus" AS ENUM ('PENDING', 'PROCESSED', 'ERROR', 'CANCELED', 'WAITING_PAYMENT');
 
 -- CreateTable
 CREATE TABLE "client_tokens" (
@@ -36,10 +36,11 @@ CREATE TABLE "sales" (
     "authorization_code" VARCHAR(20) NOT NULL,
     "client_id" UUID NOT NULL,
     "sale_status" "SaleStatus" NOT NULL,
-    "value" DECIMAL(10,2) NOT NULL,
+    "value" INTEGER NOT NULL,
     "user_code" VARCHAR(11) NOT NULL,
     "sale_date" TIMESTAMP(3) NOT NULL,
-    "webhook" TEXT,
+    "cancel_sale_date" TIMESTAMP(3),
+    "webhook" TEXT NOT NULL,
     "origin" TEXT NOT NULL,
     "log" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -86,7 +87,7 @@ CREATE INDEX "idx_sales_sale_date" ON "sales"("sale_date");
 CREATE INDEX "idx_sales_client_id" ON "sales"("client_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "sales_sale_date_authorization_code_key" ON "sales"("sale_date", "authorization_code");
+CREATE UNIQUE INDEX "sales_sale_date_authorization_code_sale_status_key" ON "sales"("sale_date", "authorization_code", "sale_status");
 
 -- AddForeignKey
 ALTER TABLE "client_tokens" ADD CONSTRAINT "client_tokens_client_id_fkey" FOREIGN KEY ("client_id") REFERENCES "clients"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

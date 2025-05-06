@@ -6,6 +6,7 @@ import { apiConfig } from './config/api.config';
 import { createSwagger } from './config/docs.config';
 import { ApplicationModule } from './modules/app.module';
 import { LoggingInterceptor } from './modules/common/flow/logger.interceptor';
+import { LogService } from './modules/common/utils';
 
 async function bootstrap(): Promise<void> {
     const app = await NestFactory.create<NestFastifyApplication>(
@@ -13,9 +14,10 @@ async function bootstrap(): Promise<void> {
         new FastifyAdapter()
     );
 
+    const logService = app.get(LogService);
     const logger = app.get(Logger);
     app.useLogger(logger);
-    app.useGlobalInterceptors(new LoggingInterceptor(logger));
+    app.useGlobalInterceptors(new LoggingInterceptor(logService));
     app.setGlobalPrefix(apiConfig.prefix);
     createSwagger(app);
 

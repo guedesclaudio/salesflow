@@ -7,6 +7,7 @@ import { HealthController } from './controller';
 import { PrismaService } from './provider';
 import { DummyResolver } from './resolvers/dummy.resolver';
 import { RestrictedGuard } from './security';
+import { LogService } from './utils';
 
 @Module({
     imports: [
@@ -19,6 +20,7 @@ import { RestrictedGuard } from './security';
         ClientValidator,
         DummyResolver,
         RestrictedGuard,
+        LogService,
     ],
     exports: [
         Logger,

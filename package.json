@@ -14,7 +14,8 @@
     "dev": "nest start --watch",
     "build": "nest build",
     "test": "env-cmd -f .env jest --config=jest.json",
-    "lint": "eslint -c .eslintrc.js --ext .ts 'src/**/*.ts'"
+    "lint": "eslint -c .eslintrc.js --ext .ts 'src/**/*.ts'",
+    "migrate:dev": "npx prisma migrate dev"
   },
   "dependencies": {
     "@apollo/client": "^3.9.5",
