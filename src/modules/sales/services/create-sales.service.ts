@@ -1,22 +1,23 @@
-import { Injectable } from "@nestjs/common";
-import { Sales, SaleStatus } from "@prisma/client";
-import { CreateSaleInputSchema } from "../schemas/inputs";
-import { SalesProducer } from "../queues/producers";
-import { SalesRepository } from "../repositories";
-import { Job } from "bullmq";
-import { Logger } from "nestjs-pino";
-import { StripeService } from "../../payment/services";
-import Stripe from "stripe";
-import { HttpService } from "../../common";
+import { Injectable } from '@nestjs/common';
+import { Sales, SaleStatus } from '@prisma/client';
+import { Job } from 'bullmq';
+import Stripe from 'stripe';
+import { MessagesEnum } from '../../../contracts/enums';
+import { HttpService } from '../../common';
+import { LogService } from '../../common/utils';
+import { StripeService } from '../../payment/services';
+import { SalesProducer } from '../queues/producers';
+import { SalesRepository } from '../repositories';
+import { CreateSaleInputSchema } from '../schemas/inputs';
 
 @Injectable()
 export class CreateSalesService {
     constructor(
         private readonly salesProducer: SalesProducer,
         private readonly salesRepository: SalesRepository,
-        private readonly logger: Logger,
         private readonly stripe: StripeService,
         private readonly httpService: HttpService,
+        private readonly logService: LogService,
     ) {}
 
     public async enqueue(createSalesDto: CreateSaleInputSchema): Promise<Boolean> {
@@ -25,6 +26,7 @@ export class CreateSalesService {
     }
 
     public async chekSale(createSalesDto: CreateSaleInputSchema, job: Job): Promise<Sales | false | undefined> {
+        createSalesDto.saleDate = new Date(createSalesDto.saleDate);
         const { authorizationCode, saleDate } = createSalesDto;
 
         try {
@@ -37,15 +39,15 @@ export class CreateSalesService {
 
             const canSkipProcessing = existingSale.saleStatus !== SaleStatus.ERROR;
             if (canSkipProcessing) {
-                this.logger.warn('Sale already exists'); //TODO - CRIAR CLASSE PARA LIDAR COM LOGS E MENSAGENS
-                await job.moveToCompleted('OK', 'true');
+                this.logService.log().Sales.AlreadyExists();
+                await job.moveToCompleted(MessagesEnum.OK, MessagesEnum.TRUE);
                 return false;
             }
 
             existingSale.webhook = createSalesDto.webhook;
             return existingSale;
         } catch (error) {
-            this.logger.error(`Error checking sale: ${error.message}`);
+            this.logService.log().Sales.CheckSaleError(error.message, error);
             throw error;
         }
     }
@@ -63,10 +65,10 @@ export class CreateSalesService {
         const sale = await this.chekSale(createSalesDto, job);
         if (!sale) return;
 
-        return this.gateway(sale, job); 
+        return this.gateway(sale, job);
     }
 
-    public handleError(saleId: string, errorMessage: string) {
+    public async handleError(saleId: string, errorMessage: string) {
         const data = this.prepareData(SaleStatus.ERROR, errorMessage);
         return this.salesRepository.update(saleId, data);
     }
@@ -75,18 +77,18 @@ export class CreateSalesService {
         return {
             saleStatus,
             log: errorMessage,
-        }
+        };
     }
 
     public async handleAttemptError(job: Job, saleId: string, error: Error): Promise<void | any[]> {
         const attemptsMade = job.attemptsMade + 1;
-        const lastAttempt = attemptsMade >= (job.opts?.attempts ?? 0)
-            
+        const lastAttempt = attemptsMade >= (job.opts?.attempts ?? 0);
+
         await this.handleError(saleId, error.message);
 
         if (lastAttempt) {
-            this.logger.error('Sale failed after all attempts') //TODO - CRIAR CLASSE PARA LIDAR COM LOGS E MENSAGENS
-            return job.moveToCompleted('OK', 'true');
+            this.logService.log().Sales.AttemptsError(error.message, error);
+            return job.moveToCompleted(MessagesEnum.OK, MessagesEnum.TRUE);
         }
 
         throw error;
@@ -94,7 +96,7 @@ export class CreateSalesService {
 
     public async sendPaymentIntent(paymentIntent: Stripe.Response<Stripe.PaymentIntent>, sale: Sales): Promise<Sales> {
         await this.httpService.post(sale.webhook, { paymentIntent });
-        const data = this.prepareData(SaleStatus.WAITING_PAYMENT, 'Payment intent sent to webhook'); //TODO - CRIAR CLASSE PARA LIDAR COM LOGS E MENSAGENS
+        const data = this.prepareData(SaleStatus.WAITING_PAYMENT, MessagesEnum.PAYMENT_INTENT_SENT_TO_WEBHOOK);
         return this.salesRepository.update(sale.id, data);
     }
 }

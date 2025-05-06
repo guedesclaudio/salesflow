@@ -1,8 +1,8 @@
 import { InputType, Field, Float } from '@nestjs/graphql';
 import { ApiProperty } from '@nestjs/swagger';
+import { SaleStatus } from '@prisma/client';
 import { IsString, IsNotEmpty, IsNumber, IsDateString, IsOptional } from 'class-validator';
 import { OriginSalesEnum } from '../../../../contracts/enums/sales.enum';
-import { SaleStatus } from '@prisma/client';
 
 @InputType()
 export class CreateSaleInputSchema {

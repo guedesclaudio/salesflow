@@ -1,12 +1,12 @@
-import { Injectable } from "@nestjs/common";
-import { ActivityStatus } from "@prisma/client";
-import { PrismaService } from "../../common/provider/prisma.provider";
+import { Injectable } from '@nestjs/common';
+import { ActivityStatus } from '@prisma/client';
+import { PrismaService } from '../../common/provider/prisma.provider';
 
 @Injectable()
 export class ClientTokensRepository {
     constructor(private readonly prisma: PrismaService) {}
 
-    public findByAccessToken(accessToken: string) {
+    public async findByAccessToken(accessToken: string) {
         return this.prisma.clientTokens.findFirst({
             where: {
                 accessToken,
@@ -16,7 +16,7 @@ export class ClientTokensRepository {
         });
     }
 
-    public findByClientId(clientId: string) {
+    public async findByClientId(clientId: string) {
         return this.prisma.clientTokens.findFirst({
             where: {
                 clientId,

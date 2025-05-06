@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
 import { PrismaService } from '../common';
-import { ClientValidator } from './validators';
 import { ClientTokensRepository } from './repositories';
+import { ClientValidator } from './validators';
 
 @Module({
     providers: [
@@ -18,7 +18,7 @@ import { ClientTokensRepository } from './repositories';
         PrismaService
     ],
     controllers: [
-       
+
     ],
 })
 export class ClientModule {}

@@ -1,7 +1,7 @@
 import * as jwt from 'jsonwebtoken';
 import { Role } from '../../tokens';
 
-export function extractTokenPayload(request: { headers?: Record<string, any> }): { role: Role, clientId: string } | null {
+export function extractTokenPayload(request: { headers?: Record<string, any> }): { role: Role; clientId: string } | null {
     const header = request?.headers?.authorization;
     if (!header || !header.startsWith('Bearer ')) {
         return null;
@@ -23,7 +23,7 @@ export function extractTokenPayload(request: { headers?: Record<string, any> }):
             return null;
         }
 
-        return payload as { role: Role, clientId: string };
+        return payload as { role: Role; clientId: string };
     }
     catch (err) {
         return null;

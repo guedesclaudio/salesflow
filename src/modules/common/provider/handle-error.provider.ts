@@ -5,15 +5,16 @@ import {
     NotFoundException,
     UnauthorizedException,
   } from '@nestjs/common';
-  
+
   export enum ErrorsTypeEnum {
     ClientNotFound,
     SaleNotFound,
     ClientIdIsDifferent,
     SaleAlreadyProcessed,
     SaleIsNotWaitingPayment,
+    PubSubMessageTypeInvalid,
   }
-  
+
   export enum ErrorsStatusEnum {
     BAD_REQUEST,
     UNAUTHORIZED,
@@ -21,7 +22,7 @@ import {
     NOT_FOUND,
     CONFLICT,
   }
-  
+
   export const errorData: Record<
     ErrorsTypeEnum,
     { defaultMessage: string; status: ErrorsStatusEnum }
@@ -46,8 +47,12 @@ import {
       defaultMessage: 'Sale is not waiting payment',
       status: ErrorsStatusEnum.BAD_REQUEST,
     },
+    [ErrorsTypeEnum.PubSubMessageTypeInvalid]: {
+      defaultMessage: 'Pub/Sub Message type is invalid',
+      status: ErrorsStatusEnum.BAD_REQUEST,
+    },
   };
-  
+
   const errorStatus = {
     [ErrorsStatusEnum.BAD_REQUEST]: (message: string) => {
       throw new BadRequestException(message);
@@ -65,10 +70,9 @@ import {
       throw new NotFoundException(message);
     },
   };
-  
+
   export function throwError(type: ErrorsTypeEnum, receivedMessage?: string): void {
     const { defaultMessage, status } = errorData[type];
     const message = receivedMessage || defaultMessage;
     errorStatus[status](message);
   }
-  

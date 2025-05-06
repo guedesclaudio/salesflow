@@ -1,1 +1,1 @@
-export { ApiResponses } from "./api-responses.decorator";
+export { ApiResponses } from './api-responses.decorator';

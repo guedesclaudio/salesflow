@@ -1,10 +1,10 @@
+import { UseGuards } from '@nestjs/common';
 import { Resolver, Mutation, Args, Int, Context } from '@nestjs/graphql';
+import { OriginSalesEnum } from '../../../contracts/enums/sales.enum';
+import { RestrictedGuard } from '../../common';
 import { CreateSaleInputSchema, PaySaleInputSchema } from '../schemas/inputs';
 import { SaleOutputSchema } from '../schemas/outputs';
-import { RestrictedGuard } from '../../common';
-import { UseGuards } from '@nestjs/common';
 import { CancelSalesService, CreateSalesService, PaySalesService } from '../services';
-import { OriginSalesEnum } from '../../../contracts/enums/sales.enum';
 
 @Resolver()
 @UseGuards(RestrictedGuard)

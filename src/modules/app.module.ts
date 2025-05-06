@@ -1,14 +1,14 @@
+import { FastifyAdapter } from '@bull-board/fastify';
+import { BullBoardModule } from '@bull-board/nestjs';
+import { ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
-import { CommonModule } from './common';
+import { GraphQLModule } from '@nestjs/graphql';
 import { LoggerModule } from 'nestjs-pino';
 import { logConfig } from '../config';
-import { AuthModule } from './auth/auth.module';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriverConfig } from '@nestjs/apollo';
 import { graphqlConfig } from '../config/graphql.config';
+import { AuthModule } from './auth/auth.module';
+import { CommonModule } from './common';
 import { SalesModule } from './sales/sales.module';
-import { BullBoardModule } from '@bull-board/nestjs';
-import { FastifyAdapter } from "@bull-board/fastify";
 
 @Module({
     imports: [

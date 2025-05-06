@@ -1,15 +1,15 @@
 export const appRoutes = {
     health: {
-        main: "/health"
+        main: '/health'
     },
     auth: {
-        main: "/auth",
-        generateJWTToken: "/generateJWTToken",
+        main: '/auth',
+        generateJWTToken: '/generateJWTToken',
     },
     sales: {
-        main: "/sales",
-        createSale: "createSale",
-        cancelSale: "cancelSale",
-        paySale: "paySale",
+        main: '/sales',
+        createSale: 'createSale',
+        cancelSale: 'cancelSale',
+        paySale: 'paySale',
     }
-}
+};

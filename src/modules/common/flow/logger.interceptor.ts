@@ -4,15 +4,15 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { Logger } from 'nestjs-pino';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { throwError, Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
 import * as useragent from 'useragent';
-import { GqlExecutionContext } from '@nestjs/graphql';
+import { LogService } from '../utils';
 
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly logService: LogService) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     try {
@@ -35,7 +35,12 @@ export class LoggingInterceptor implements NestInterceptor {
       const origin = headers?.origin;
       const securityInfos = this.createSecurityInfos(request, headers);
       const data = this.createDataLog({ body, params, query });
-      this.logRequest({ method, url, origin, data, securityInfos });
+      this.logService.log().LoggingInterceptor.Request({
+        method,
+        url,
+        origin,
+        securityInfos,
+      }, data);
       const now = Date.now();
 
       return next.handle().pipe(
@@ -48,35 +53,31 @@ export class LoggingInterceptor implements NestInterceptor {
               query: null,
             }) as { body: any };
 
-            this.logResponse({
+            this.logService.log().LoggingInterceptor.Response({
               method,
               url,
               responseTime,
-              data,
-              responseData: processedResponseData.body,
-              securityInfos,
               origin,
-            });
+              securityInfos,
+            }, {data, responseData: processedResponseData?.body});
           } catch (error) {
-            this.logTotalError();
+            this.logService.log().LoggingInterceptor.TotalError();
           }
         }),
         catchError((err) => {
           const responseTime = Date.now() - now;
-          this.logResponseError({
+          this.logService.log().LoggingInterceptor.ResponseError({
             method,
             url,
             responseTime,
-            data: {},
-            err,
-            securityInfos,
             origin,
-          });
+            securityInfos,
+          }, {data, err});
           return throwError(() => err);
         }),
       );
     } catch (error) {
-      this.logTotalError();
+      this.logService.log().LoggingInterceptor.TotalError();
       return next.handle();
     }
   }
@@ -96,9 +97,9 @@ export class LoggingInterceptor implements NestInterceptor {
 
   public createDataLog({ body, query, params }: any) {
     try {
-      const bodyLog = JSON.parse(JSON.stringify(body));
-      const queryLog = JSON.parse(JSON.stringify(query));
-      const paramsLog = JSON.parse(JSON.stringify(params));
+      const bodyLog = JSON.parse(JSON.stringify(body ?? {}));
+      const queryLog = JSON.parse(JSON.stringify(query ?? {}));
+      const paramsLog = JSON.parse(JSON.stringify(params ?? {}));
 
       [bodyLog, queryLog, paramsLog].forEach((value) => {
         if (value) this.handleSensitivesFields(value);
@@ -110,47 +111,9 @@ export class LoggingInterceptor implements NestInterceptor {
         params: paramsLog,
       });
     } catch (error) {
-      this.logger.error(`Anonymization Error - Error: ${error?.message}`);
+      this.logService.log().LoggingInterceptor.AnonymizationError(error.message, error);
       return {};
     }
-  }
-
-  public logRequest({ method, url, origin, data, securityInfos }: any): void {
-    this.logger.log(
-      `Request: [${method}] ${url} - Origin ${origin} - Data: ${JSON.stringify(
-        data,
-      )} - SecurityInfos: ${JSON.stringify(securityInfos)}`,
-    );
-  }
-
-  public logTotalError(): void {
-    this.logger.error('Error: Log total error occurred.');
-  }
-
-  public logResponse({
-    method,
-    url,
-    responseTime,
-    data,
-    responseData,
-    securityInfos,
-    origin,
-  }: any): void {
-    this.logger.log(
-      `Response: [${method}] ${url} - Time: ${responseTime}ms - Origin ${origin} - InputData: ${JSON.stringify(
-        data,
-      )} - ResponseData: ${JSON.stringify(responseData)} - SecurityInfos: ${JSON.stringify(
-        securityInfos,
-      )}`,
-    );
-  }
-
-  public logResponseError({ method, url, responseTime, data, err, securityInfos, origin }: any): void {
-    this.logger.error(
-      `ResponseError: [${method}] ${url} - Time: ${responseTime}ms - Origin ${origin} - InputData: ${JSON.stringify(
-        data,
-      )} - Error: ${JSON.stringify(err?.message)} - SecurityInfos: ${JSON.stringify(securityInfos)}`,
-    );
   }
 
   public returnsValidFields({ body, query, params }: any) {

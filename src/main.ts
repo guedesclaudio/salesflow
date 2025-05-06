@@ -1,13 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Logger } from 'nestjs-pino';
-import { ApplicationModule } from './modules/app.module';
-import { LoggingInterceptor } from './modules/common/flow/logger.interceptor';
+import { upPubSub } from './config';
 import { apiConfig } from './config/api.config';
 import { createSwagger } from './config/docs.config';
-import { upPubSub } from './config';
+import { ApplicationModule } from './modules/app.module';
+import { LoggingInterceptor } from './modules/common/flow/logger.interceptor';
 
-async function bootstrap(): Promise<void> { 
+async function bootstrap(): Promise<void> {
     const app = await NestFactory.create<NestFastifyApplication>(
         ApplicationModule,
         new FastifyAdapter()

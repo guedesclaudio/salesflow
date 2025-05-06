@@ -1,16 +1,18 @@
-import { Module } from '@nestjs/common';
-import { SalesController } from './controllers';
-import { ClientModule } from '../clients/client.module';
-import { SalesResolver } from './resolvers';
-import { SalesRepository } from './repositories';
-import { CancelSalesService, CreateSalesService, PaySalesService } from './services';
+import { PubSub } from '@google-cloud/pubsub';
 import { BullModule } from '@nestjs/bullmq';
-import { SalesQueuesEnum } from '../../contracts/enums/sales.enum';
+import { Module } from '@nestjs/common';
 import { cacheConfig } from '../../config';
-import { PaySalesProducer, SalesProducer } from './queues/producers';
-import { SalesConsumer } from './queues/consumers';
-import { StripeService } from '../payment/services';
+import { SalesQueuesEnum } from '../../contracts/enums/sales.enum';
+import { ClientModule } from '../clients/client.module';
 import { HttpService } from '../common';
+import { LogService } from '../common/utils';
+import { StripeService } from '../payment/services';
+import { SalesController } from './controllers';
+import { PaySalesProducer, SalesProducer } from './queues/producers';
+import { SalesRepository } from './repositories';
+import { SalesResolver } from './resolvers';
+import { CancelSalesService, CreateSalesService, PaySalesService, PubSubSalesService } from './services';
+import { SalesConsumer } from './queues/consumers';
 import { PaySalesConsumer } from './queues/consumers/pay-sale.consumer';
 import { SalesValidator } from './validators';
 
@@ -32,18 +34,21 @@ import { SalesValidator } from './validators';
   ),
   ],
   providers: [
-    SalesRepository, 
-    SalesResolver, 
-    CreateSalesService, 
-    CancelSalesService, 
-    SalesProducer, 
-    SalesConsumer, 
-    StripeService, 
+    SalesRepository,
+    SalesResolver,
+    CreateSalesService,
+    CancelSalesService,
+    SalesProducer,
+    SalesConsumer,
+    StripeService,
     HttpService,
     PaySalesService,
     PaySalesProducer,
     PaySalesConsumer,
     SalesValidator,
+    PubSub,
+    PubSubSalesService,
+    LogService,
   ],
   controllers: [SalesController],
 })

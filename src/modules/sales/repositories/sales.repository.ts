@@ -1,19 +1,19 @@
-import { Sales, SaleStatus } from "@prisma/client";
-import { PrismaService } from "../../common";
-import { CreateSaleInputSchema } from "../schemas/inputs";
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
+import { Sales, SaleStatus } from '@prisma/client';
+import { PrismaService } from '../../common';
+import { CreateSaleInputSchema } from '../schemas/inputs';
 
 @Injectable()
 export class SalesRepository {
     constructor(private readonly prisma: PrismaService) {}
-    
-    public create(data: CreateSaleInputSchema): Promise<Sales> {
+
+    public async create(data: CreateSaleInputSchema): Promise<Sales> {
         return this.prisma.sales.create({
             data,
         });
     }
 
-    public update(id: string, data: any): Promise<Sales> {
+    public async update(id: string, data: any): Promise<Sales> {
         return this.prisma.sales.update({
             where: {
                 id,
@@ -23,7 +23,7 @@ export class SalesRepository {
         });
     }
 
-    public findUniqueByConstraint(authorizationCode: string, saleDate: Date, saleStatusList?: SaleStatus[]) {
+    public async findUniqueByConstraint(authorizationCode: string, saleDate: Date, saleStatusList?: SaleStatus[]) {
         return this.prisma.sales.findFirst({
             where: {
                 authorizationCode,
@@ -36,12 +36,12 @@ export class SalesRepository {
         });
     }
 
-    public findById(saleId: string) {
+    public async findById(saleId: string) {
         return this.prisma.sales.findUnique({
             where: {
                 id: saleId,
                 deletedAt: null,
             },
-        })
+        });
     }
 }

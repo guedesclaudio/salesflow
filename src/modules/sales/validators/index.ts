@@ -1,1 +1,1 @@
-export { SalesValidator } from "./sale.validator";
+export { SalesValidator } from './sale.validator';

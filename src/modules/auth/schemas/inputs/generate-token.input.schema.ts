@@ -1,7 +1,7 @@
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
-import { Role } from '../../../tokens';
 import { InputType, Field } from '@nestjs/graphql';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { Role } from '../../../tokens';
 
 @InputType()
 export class GenerateTokenInputSchema {

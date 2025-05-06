@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { Sales, SaleStatus } from "@prisma/client";
-import { PaySaleInputSchema } from "../schemas/inputs";
-import { PaySalesProducer } from "../queues/producers";
-import { SalesRepository } from "../repositories";
-import { SalesValidator } from "../validators";
+import { Injectable } from '@nestjs/common';
+import { Sales, SaleStatus } from '@prisma/client';
+import { PaySalesProducer } from '../queues/producers';
+import { SalesRepository } from '../repositories';
+import { PaySaleInputSchema } from '../schemas/inputs';
+import { SalesValidator } from '../validators';
 
 @Injectable()
 export class PaySalesService {
@@ -23,8 +23,8 @@ export class PaySalesService {
     public async processPayment(paySalesDto: PaySaleInputSchema): Promise<Sales> {
         const data = {
             saleStatus: SaleStatus.PROCESSED,
-            log: "Sale paid successfully",
-        }
+            log: 'Sale paid successfully',
+        };
         return this.salesRepository.update(paySalesDto.saleId, data);
     }
 }

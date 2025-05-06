@@ -12,7 +12,7 @@ export class PaySaleInputSchema {
   @IsNotEmpty()
   @Field(() => String, { description: 'Sale Identification' })
   saleId: string;
-  
+
   // Private
   clientId: string;
 }

@@ -1,9 +1,9 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 import { FastifyRequest } from 'fastify';
+import { ClientValidator } from '../../clients/validators';
 import { Role } from '../../tokens';
 import { extractTokenPayload } from './security-utils';
-import { ClientValidator } from '../../clients/validators';
-import { GqlExecutionContext } from '@nestjs/graphql';
 
 @Injectable()
 export class RestrictedGuard implements CanActivate {
@@ -23,7 +23,7 @@ export class RestrictedGuard implements CanActivate {
 
         const payload = extractTokenPayload(request as any);
         if (!payload) return false;
-        
+
         const isRestricted = (payload.role === Role.RESTRICTED);
         if (!isRestricted) return false;
 

@@ -3,15 +3,15 @@ import Stripe from 'stripe';
 
 @Injectable()
 export class StripeService {
-  private stripe: Stripe;
+  private readonly stripe: Stripe;
 
   constructor() {
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', { //TODO - LEVAR PRA CONFIG
+    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', { // TODO - LEVAR PRA CONFIG
       apiVersion: '2025-03-31.basil',
     });
   }
 
-  
+
   public async createPaymentIntent(amount: number, saleId: string) {
     const paymentIntent = await this.stripe.paymentIntents.create({
       amount,
@@ -28,7 +28,7 @@ export class StripeService {
     return this.stripe.webhooks.constructEvent(
       payload,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET ?? '', //TODO - LEVAR PRA CONFIG
+      process.env.STRIPE_WEBHOOK_SECRET ?? '', // TODO - LEVAR PRA CONFIG
     );
   }
 }

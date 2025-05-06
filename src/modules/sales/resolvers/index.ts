@@ -1,1 +1,1 @@
-export { SalesResolver } from "./sales.resolver";
+export { SalesResolver } from './sales.resolver';

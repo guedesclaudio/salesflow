@@ -3,4 +3,4 @@ export const apiConfig = {
     prefix: process.env.API_PREFIX || '/api',
     nodeEnv: process.env.NODE_ENV || 'development',
     host: process.env.API_HOST || 'localhost',
-}
+};

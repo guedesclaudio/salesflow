@@ -1,1 +1,1 @@
-export { SaleOutputSchema } from "./create-sale.input.schema";
+export { SaleOutputSchema } from './create-sale.input.schema';

@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
 import { InjectQueue } from '@nestjs/bullmq';
+import { Injectable } from '@nestjs/common';
 import { Queue } from 'bullmq';
-import { PaySaleInputSchema } from '../../schemas/inputs';
 import { queuesConfig } from '../../../../config/queues.config';
+import { PaySaleInputSchema } from '../../schemas/inputs';
 
 @Injectable()
 export class PaySalesProducer {
@@ -21,6 +21,6 @@ export class PaySalesProducer {
       backoff: { type: 'exponential', delay: queuesConfig.paySaleQueue.backoffDelay },
       removeOnComplete: true,
       removeOnFail: false,
-    }
+    };
   }
 }
