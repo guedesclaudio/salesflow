@@ -1,9 +1,4 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor,
-} from '@nestjs/common';
+import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { throwError, Observable } from 'rxjs';
 import { tap, catchError } from 'rxjs/operators';
@@ -26,7 +21,6 @@ export class LoggingInterceptor implements NestInterceptor {
         request = gqlCtx.getContext().req;
       }
 
-
       if (!request) {
         return next.handle();
       }
@@ -35,12 +29,15 @@ export class LoggingInterceptor implements NestInterceptor {
       const origin = headers?.origin;
       const securityInfos = this.createSecurityInfos(request, headers);
       const data = this.createDataLog({ body, params, query });
-      this.logService.log().LoggingInterceptor.Request({
-        method,
-        url,
-        origin,
-        securityInfos,
-      }, data);
+      this.logService.log().LoggingInterceptor.Request(
+        {
+          method,
+          url,
+          origin,
+          securityInfos,
+        },
+        data,
+      );
       const now = Date.now();
 
       return next.handle().pipe(
@@ -53,26 +50,32 @@ export class LoggingInterceptor implements NestInterceptor {
               query: null,
             }) as { body: any };
 
-            this.logService.log().LoggingInterceptor.Response({
-              method,
-              url,
-              responseTime,
-              origin,
-              securityInfos,
-            }, {data, responseData: processedResponseData?.body});
+            this.logService.log().LoggingInterceptor.Response(
+              {
+                method,
+                url,
+                responseTime,
+                origin,
+                securityInfos,
+              },
+              { data, responseData: processedResponseData?.body },
+            );
           } catch (error) {
             this.logService.log().LoggingInterceptor.TotalError();
           }
         }),
         catchError((err) => {
           const responseTime = Date.now() - now;
-          this.logService.log().LoggingInterceptor.ResponseError({
-            method,
-            url,
-            responseTime,
-            origin,
-            securityInfos,
-          }, {data, err});
+          this.logService.log().LoggingInterceptor.ResponseError(
+            {
+              method,
+              url,
+              responseTime,
+              origin,
+              securityInfos,
+            },
+            { data, err },
+          );
           return throwError(() => err);
         }),
       );

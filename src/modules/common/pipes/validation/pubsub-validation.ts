@@ -12,9 +12,7 @@ export class MessagePubSubValidationPipe implements PipeTransform {
     try {
       const data = messageProcessor(message);
       const { type } = data;
-      const validTypes = [
-        'create.sale',
-      ];
+      const validTypes = ['create.sale'];
 
       if (!validTypes.includes(type)) throwError(ErrorsTypeEnum.PubSubMessageTypeInvalid);
 
@@ -27,7 +25,6 @@ export class MessagePubSubValidationPipe implements PipeTransform {
 
       if (messageIsInvalid) throw new Error(messageIsInvalid as string);
       return message;
-
     } catch (error) {
       message.ack();
       console.error(`PubSub Validation Error: ${error.message}`);
@@ -52,7 +49,9 @@ export class MessagePubSubValidationPipe implements PipeTransform {
 
     errors.map((error: any) => {
       propertyErrors += `${error.property}, `;
-      constraintsErrors += error.children?.map((constraint: any) => `${JSON.stringify(constraint?.constraints)}, `);
+      constraintsErrors += error.children?.map(
+        (constraint: any) => `${JSON.stringify(constraint?.constraints)}, `,
+      );
     });
     return `Properties [${propertyErrors}] and constraints [${constraintsErrors}] are invalid`;
   }

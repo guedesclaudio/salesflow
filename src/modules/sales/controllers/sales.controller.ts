@@ -11,7 +11,12 @@ import { ApiResponses } from '../../common/decorators';
 import { MessagePubSubValidationPipe } from '../../common/pipes/validation';
 import { CreateSaleInputSchema, PaySaleInputSchema } from '../schemas/inputs';
 import { SaleOutputSchema } from '../schemas/outputs';
-import { CancelSalesService, CreateSalesService, PaySalesService, PubSubSalesService } from '../services';
+import {
+  CancelSalesService,
+  CreateSalesService,
+  PaySalesService,
+  PubSubSalesService,
+} from '../services';
 
 @ApiTags(appRoutes.sales.main)
 @Controller(appRoutes.sales.main)
@@ -20,7 +25,7 @@ export class SalesController {
     private readonly createSalesService: CreateSalesService,
     private readonly cancelSalesService: CancelSalesService,
     private readonly paySalesService: PaySalesService,
-    //private readonly pubsub: PubSub,
+    // private readonly pubsub: PubSub,
     private readonly pubsubSalesService: PubSubSalesService,
   ) {}
 
@@ -31,7 +36,7 @@ export class SalesController {
   public async createSale(
     @Body() createSalesDto: CreateSaleInputSchema,
     @Req() req: FastifyRequest,
-  ): Promise<Boolean> {
+  ): Promise<boolean> {
     createSalesDto.origin = OriginSalesEnum.HTTP;
     createSalesDto.clientId = (req as any).clientId;
     return this.createSalesService.enqueue(createSalesDto);
@@ -39,9 +44,7 @@ export class SalesController {
 
   @EventPattern(pubSubConfig.subscriptions.createSale)
   @UsePipes(new MessagePubSubValidationPipe())
-  public async createSaleFromPubSub(
-    @Body() message: Message,
-  ): Promise<Boolean> {
+  public async createSaleFromPubSub(@Body() message: Message): Promise<boolean> {
     return this.pubsubSalesService.processMessage(message);
   }
 
@@ -52,7 +55,7 @@ export class SalesController {
   public async paySale(
     @Body() paySalesDto: PaySaleInputSchema,
     @Req() req: FastifyRequest,
-  ): Promise<Boolean> {
+  ): Promise<boolean> {
     paySalesDto.clientId = (req as any).clientId;
     return this.paySalesService.enqueue(paySalesDto);
   }

@@ -5,19 +5,19 @@ import { ClientTokensRepository } from '../repositories';
 
 @Injectable()
 export class ClientValidator {
-    constructor(private readonly clientTokensRepository: ClientTokensRepository) {}
+  constructor(private readonly clientTokensRepository: ClientTokensRepository) {}
 
-    public async checkAccessToken(accessToken: string): Promise<ClientTokens | void> {
-        const existingClient = await this.clientTokensRepository.findByAccessToken(accessToken);
+  public async checkAccessToken(accessToken: string): Promise<ClientTokens | void> {
+    const existingClient = await this.clientTokensRepository.findByAccessToken(accessToken);
 
-        if (!existingClient) return throwError(ErrorsTypeEnum.ClientNotFound);
-        return existingClient;
-    }
+    if (!existingClient) return throwError(ErrorsTypeEnum.ClientNotFound);
+    return existingClient;
+  }
 
-    public async checkId(clientId: string): Promise<ClientTokens | boolean> {
-        const existingClient = await this.clientTokensRepository.findByClientId(clientId);
+  public async checkId(clientId: string): Promise<ClientTokens | boolean> {
+    const existingClient = await this.clientTokensRepository.findByClientId(clientId);
 
-        if (!existingClient) return false;
-        return existingClient;
-    }
+    if (!existingClient) return false;
+    return existingClient;
+  }
 }

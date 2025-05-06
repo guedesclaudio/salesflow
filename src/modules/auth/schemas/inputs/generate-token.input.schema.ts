@@ -5,7 +5,9 @@ import { Role } from '../../../tokens';
 
 @InputType()
 export class GenerateTokenInputSchema {
-  @Field(() => Role, { description: 'Role for generating the token. Must be one of the allowed roles.' })
+  @Field(() => Role, {
+    description: 'Role for generating the token. Must be one of the allowed roles.',
+  })
   @ApiProperty({
     description: 'Role for generating the token. Must be one of the allowed roles.',
     enum: Role,

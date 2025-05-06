@@ -10,23 +10,17 @@ import { RestrictedGuard } from './security';
 import { LogService } from './utils';
 
 @Module({
-    imports: [
-        TerminusModule
-    ],
-    providers: [
-        Logger,
-        PrismaService,
-        ClientTokensRepository,
-        ClientValidator,
-        DummyResolver,
-        RestrictedGuard,
-        LogService,
-    ],
-    exports: [
-        Logger,
-    ],
-    controllers: [
-        HealthController
-    ],
+  imports: [TerminusModule],
+  providers: [
+    Logger,
+    PrismaService,
+    ClientTokensRepository,
+    ClientValidator,
+    DummyResolver,
+    RestrictedGuard,
+    LogService,
+  ],
+  exports: [Logger],
+  controllers: [HealthController],
 })
 export class CommonModule {}

@@ -13,8 +13,14 @@ export class AuthController {
 
   @Post(appRoutes.auth.generateJWTToken)
   @ApiOperation({ summary: 'Generate JWT token' })
-  @ApiResponses({ sucessStatusCode: 201, succesType: GenerateTokenOutputSchema, isProtected: false })
-  public async generateToken(@Body() generateTokenDto: GenerateTokenInputSchema): Promise<GenerateTokenOutputSchema> {
+  @ApiResponses({
+    sucessStatusCode: 201,
+    succesType: GenerateTokenOutputSchema,
+    isProtected: false,
+  })
+  public async generateToken(
+    @Body() generateTokenDto: GenerateTokenInputSchema,
+  ): Promise<GenerateTokenOutputSchema> {
     return this.authService.generateToken(generateTokenDto);
   }
 }

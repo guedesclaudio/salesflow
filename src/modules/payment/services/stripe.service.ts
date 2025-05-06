@@ -6,11 +6,11 @@ export class StripeService {
   private readonly stripe: Stripe;
 
   constructor() {
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', { // TODO - LEVAR PRA CONFIG
+    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
+      // TODO - LEVAR PRA CONFIG
       apiVersion: '2025-03-31.basil',
     });
   }
-
 
   public async createPaymentIntent(amount: number, saleId: string) {
     const paymentIntent = await this.stripe.paymentIntents.create({

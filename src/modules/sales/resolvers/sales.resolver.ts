@@ -19,7 +19,7 @@ export class SalesResolver {
   async createSale(
     @Args('input') createSalesDto: CreateSaleInputSchema,
     @Context() context: any,
-  ): Promise<Boolean> {
+  ): Promise<boolean> {
     createSalesDto.origin = OriginSalesEnum.GRAPHQL;
     createSalesDto.clientId = context.req.clientId;
     return this.createSalesService.enqueue(createSalesDto);
@@ -29,15 +29,13 @@ export class SalesResolver {
   async paySale(
     @Args('input') paySalesDto: PaySaleInputSchema,
     @Context() context: any,
-  ): Promise<Boolean> {
+  ): Promise<boolean> {
     paySalesDto.clientId = context.req.clientId;
     return this.paySalesService.enqueue(paySalesDto);
   }
 
   @Mutation(() => SaleOutputSchema, { name: 'cancelSale' })
-  async cancelSale(
-    @Args('id', { type: () => Int }) id: number,
-  ): Promise<SaleOutputSchema> {
+  async cancelSale(@Args('id', { type: () => Int }) id: number): Promise<SaleOutputSchema> {
     // TODO - PRECISAR ADICIONAR ORIGIN, E NAO VAI USAR ID, VAI USAR AUTHORIZATION_CODE E DATA DA VENDA
     return this.cancelSalesService.cancel(id);
   }

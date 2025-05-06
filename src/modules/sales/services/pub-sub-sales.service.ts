@@ -9,32 +9,34 @@ import { CreateSalesService } from './create-sales.service';
 
 @Injectable()
 export class PubSubSalesService {
-    constructor(
-        private readonly clientValidator: ClientValidator,
-        private readonly logService: LogService,
-        private readonly createSalesService: CreateSalesService
-    ) {}
+  constructor(
+    private readonly clientValidator: ClientValidator,
+    private readonly logService: LogService,
+    private readonly createSalesService: CreateSalesService,
+  ) {}
 
-    public async processMessage(message: Message) {
-        const data: {type: string; payload: CreateSaleInputSchema} = JSON.parse(message.data.toString());
-        const payload = data.payload;
-        payload.origin = OriginSalesEnum.PUBSUB;
+  public async processMessage(message: Message) {
+    const data: { type: string; payload: CreateSaleInputSchema } = JSON.parse(
+      message.data.toString(),
+    );
+    const payload = data.payload;
+    payload.origin = OriginSalesEnum.PUBSUB;
 
-        try {
-            this.logService.log().PubSub.Received(data.type, data);
+    try {
+      this.logService.log().PubSub.Received(data.type, data);
 
-            const client = await this.clientValidator.checkId(payload.clientId);
-            if (!client) throwError(ErrorsTypeEnum.ClientNotFound);
+      const client = await this.clientValidator.checkId(payload.clientId);
+      if (!client) throwError(ErrorsTypeEnum.ClientNotFound);
 
-            await this.createSalesService.enqueue(payload);
+      await this.createSalesService.enqueue(payload);
 
-            this.logService.log().PubSub.Enqueued(data.type, data);
-            message.ack();
-            return true;
-        } catch (error) {
-            this.logService.log().PubSub.Error(error.message, error);
-            message.ack();
-            return false;
-        }
+      this.logService.log().PubSub.Enqueued(data.type, data);
+      message.ack();
+      return true;
+    } catch (error) {
+      this.logService.log().PubSub.Error(error.message, error);
+      message.ack();
+      return false;
     }
+  }
 }

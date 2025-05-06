@@ -11,20 +11,20 @@ import { CommonModule } from './common';
 import { SalesModule } from './sales/sales.module';
 
 @Module({
-    imports: [
-        // ServeStaticModule.forRoot({
-        //     rootPath: join(__dirname, '..', 'public'),
-        //     exclude: ['/graphql*', '/health*'],
-        //   }),
-        LoggerModule.forRoot(logConfig()),
-        CommonModule,
-        AuthModule,
-        GraphQLModule.forRoot<ApolloDriverConfig>(graphqlConfig),
-        BullBoardModule.forRoot({
-            route: '/queues',
-            adapter: FastifyAdapter,
-        }),
-        SalesModule,
-    ],
+  imports: [
+    // ServeStaticModule.forRoot({
+    //     rootPath: join(__dirname, '..', 'public'),
+    //     exclude: ['/graphql*', '/health*'],
+    //   }),
+    LoggerModule.forRoot(logConfig()),
+    CommonModule,
+    AuthModule,
+    GraphQLModule.forRoot<ApolloDriverConfig>(graphqlConfig),
+    BullBoardModule.forRoot({
+      route: '/queues',
+      adapter: FastifyAdapter,
+    }),
+    SalesModule,
+  ],
 })
 export class ApplicationModule {}
