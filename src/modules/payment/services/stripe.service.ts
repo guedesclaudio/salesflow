@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
+import { paymentConfig } from '../../../config';
 
 @Injectable()
 export class StripeService {
   private readonly stripe: Stripe;
 
   constructor() {
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY ?? '', {
-      // TODO - LEVAR PRA CONFIG
-      apiVersion: '2025-03-31.basil',
+    this.stripe = new Stripe(paymentConfig.stripe.secretKey, {
+      apiVersion: paymentConfig.stripe.apiVersion,
     });
   }
 
@@ -28,7 +28,7 @@ export class StripeService {
     return this.stripe.webhooks.constructEvent(
       payload,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET ?? '', // TODO - LEVAR PRA CONFIG
+      paymentConfig.stripe.webhookSecret,
     );
   }
 }
