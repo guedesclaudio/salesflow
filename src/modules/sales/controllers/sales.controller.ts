@@ -25,7 +25,6 @@ export class SalesController {
     private readonly createSalesService: CreateSalesService,
     private readonly cancelSalesService: CancelSalesService,
     private readonly paySalesService: PaySalesService,
-    // private readonly pubsub: PubSub,
     private readonly pubsubSalesService: PubSubSalesService,
   ) {}
 
